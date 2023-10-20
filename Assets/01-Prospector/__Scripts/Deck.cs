@@ -18,6 +18,8 @@ public class Deck : MonoBehaviour {
 	public Sprite cardBackGold;
 	public Sprite cardFront;
 	public Sprite cardFrontGold;
+
+	public bool startFaceUp = true;
 	
 	
 	// Prefabs
@@ -137,7 +139,14 @@ public class Deck : MonoBehaviour {
 		return (null);
 	}//GetCardDefinitionByRank
 	
-	
+
+
+	/// <summary>
+    /// This is the first edition version of MakeCards - ot does ALL THE WORK
+    ///
+    /// In the second edition JGB splits this into multiple functions that get called
+    /// to complete the task
+    /// </summary>
 	public void MakeCards() {
 		// stub Add the code from page 577 here
 		cardNames = new List<string>();
@@ -155,7 +164,11 @@ public class Deck : MonoBehaviour {
 		Sprite tS = null;
 		GameObject tGO = null;
 		SpriteRenderer tSR = null;  // so tempted to make a D&D ref here...
-		
+
+
+		//
+		//  This is effectively the MakeCard function
+		//
 		for (int i=0; i<cardNames.Count; i++) {
 			GameObject cgo = Instantiate(prefabCard) as GameObject;
 			cgo.transform.parent = deckAnchor;
@@ -173,8 +186,10 @@ public class Deck : MonoBehaviour {
 			}
 			
 			card.def = GetCardDefinitionByRank(card.rank);
-			
-			// Add Decorators
+
+			//
+			// This is the Add Decorators function
+			//
 			foreach (Decorator deco in decorators) {
 				tGO = Instantiate(prefabSprite) as GameObject;
 				tSR = tGO.GetComponent<SpriteRenderer>();
@@ -203,8 +218,9 @@ public class Deck : MonoBehaviour {
 				card.decoGOs.Add (tGO);
 			} // foreach Deco
 			
-			
-			//Add the pips
+			//
+			// This is add pips function
+			//
 			foreach(Decorator pip in card.def.pips) {
 				tGO = Instantiate(prefabSprite) as GameObject;
 				tGO.transform.parent = cgo.transform; 
@@ -224,8 +240,11 @@ public class Deck : MonoBehaviour {
 				tSR.sortingOrder = 1;
 				card.pipGOs.Add (tGO);
 			}
-			
-			//Handle face cards
+
+
+			//
+			//This is AddFace 
+			//
 			if (card.def.face != "") {
 				tGO = Instantiate(prefabSprite) as GameObject;
 				tSR = tGO.GetComponent<SpriteRenderer>();
@@ -238,6 +257,10 @@ public class Deck : MonoBehaviour {
 				tGO.name = "face";
 			}
 
+
+			//
+			// This is AddBack
+			//
 			tGO = Instantiate(prefabSprite) as GameObject;
 			tSR = tGO.GetComponent<SpriteRenderer>();
 			tSR.sprite = cardBack;
@@ -246,7 +269,7 @@ public class Deck : MonoBehaviour {
 			tSR.sortingOrder = 2;
 			tGO.name = "back";
 			card.back = tGO;
-			card.faceUp = false;
+			card.faceUp = startFaceUp;
 			
 			cards.Add (card);
 		} // for all the Cardnames	
@@ -262,6 +285,12 @@ public class Deck : MonoBehaviour {
 		return (null);  // couldn't find the sprite (should never reach this line)
 	 }// getFace 
 
+
+	 /// <summary>
+     /// Given a list of Card objects, randomly rearrange the objects into a random order
+     /// </summary>
+     /// <param name="oCards">reference to a List of Card object. Passed by reference, the original order of
+     /// the list will be changed upon exiting the function</param>
 	 static public void Shuffle(ref List<Card> oCards)
 	 {
 	 	List<Card> tCards = new List<Card>();
